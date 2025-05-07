@@ -1,59 +1,24 @@
-import OpenAI from "openai";
 import { Mistral } from '@mistralai/mistralai';
-import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
-import { AzureKeyCredential } from "@azure/core-auth";
 
 const token = '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';
 const endpoint = "https://models.github.ai/inference";
 
 const MODELS = {
   primary: {
-    name: "openai/gpt-4.1",
-    client: new OpenAI({ baseURL: endpoint, apiKey: token, dangerouslyAllowBrowser: true })
-  },
-  fallback1: {
     name: "mistral-ai/Mistral-Large-2411",
     client: new Mistral({ apiKey: token, serverURL: endpoint })
-  },
-  fallback2: {
-    name: "meta/Llama-3.2-11B-Vision-Instruct",
-    client: ModelClient(endpoint, new AzureKeyCredential(token))
   }
 };
 
 const generateWithModel = async (model, messages, temperature = 0.7, top_p = 1.0) => {
   try {
-    if (model.name.includes('mistral')) {
-      const response = await model.client.chat.complete({
-        model: model.name,
-        messages: messages,
-        temperature: temperature,
-        top_p: top_p
-      });
-      return response.choices[0].message.content;
-    } else if (model.name.includes('Llama')) {
-      const response = await model.client.path("/chat/completions").post({
-        body: {
-          messages: messages,
-          temperature: temperature,
-          top_p: top_p,
-          max_tokens: 1000,
-          model: model.name
-        }
-      });
-      if (isUnexpected(response)) {
-        throw response.body.error;
-      }
-      return response.body.choices[0].message.content;
-    } else {
-      const response = await model.client.chat.completions.create({
-        messages: messages,
-        temperature: temperature,
-        top_p: top_p,
-        model: model.name
-      });
-      return response.choices[0].message.content;
-    }
+    const response = await model.client.chat.complete({
+      model: model.name,
+      messages: messages,
+      temperature: temperature,
+      top_p: top_p
+    });
+    return response.choices[0].message.content;
   } catch (error) {
     if (error.message?.includes('token limit') || error.message?.includes('context length')) {
       throw new Error('TOKEN_LIMIT');
@@ -139,25 +104,13 @@ export const generateAISuggestion = async ({
       }
     ];
 
-    let lastError = null;
-    for (const [key, model] of Object.entries(MODELS)) {
-      try {
-        const suggestion = await generateWithModel(model, messages);
-        return {
-          success: true,
-          suggestion: suggestion.trim(),
-          model: key
-        };
-      } catch (error) {
-        lastError = error;
-        if (error.message !== 'TOKEN_LIMIT') {
-          break;
-        }
-        console.log(`Model ${key} failed with token limit, trying next model...`);
-      }
-    }
-
-    throw lastError;
+    const model = MODELS.primary;
+    const suggestion = await generateWithModel(model, messages);
+    return {
+      success: true,
+      suggestion: suggestion.trim(),
+      model: 'primary'
+    };
 
   } catch (error) {
     console.error('Error generating AI suggestion:', error);
@@ -179,4 +132,4 @@ export const renderFormattedText = (text) => {
     }
     return <span key={index}>{part}</span>;
   });
-}; 
+};
