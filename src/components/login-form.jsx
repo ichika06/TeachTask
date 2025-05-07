@@ -72,7 +72,9 @@ export function LoginForm({ className, ...props }) {
         const file = avatar[0]
         const fileExt = file.name.split('.').pop()
         const fileName = `${authData.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`
-        const filePath = `avatars/${fileName}`
+
+        // Fix: Remove 'avatars/' from the filePath
+        const filePath = fileName
 
         const { error: uploadError } = await supabase.storage
           .from('avatars')
