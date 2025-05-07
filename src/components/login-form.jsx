@@ -193,8 +193,8 @@ export function LoginForm({ className, ...props }) {
                 </motion.h1>
                 <motion.p layout className="text-muted-foreground text-balance">
                   {isSignup
-                    ? "Sign up for your Acme Inc account"
-                    : "Login to your Acme Inc account"}
+                    ? "Sign up for TeachTask"
+                    : "Login to TeachTask"}
                 </motion.p>
               </motion.div>
 
