@@ -77,8 +77,11 @@ export function LoginForm({ className, ...props }) {
         const filePath = fileName
 
         const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, file)
+        .from('avatars')
+        .upload(filePath, file, {
+          upsert: true, // prevent collision errors
+          contentType: file.type, // ensure proper MIME
+        })
 
         if (uploadError) throw new Error(`Avatar upload failed: ${uploadError.message}`)
 
