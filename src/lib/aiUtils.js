@@ -1,6 +1,6 @@
 import { Mistral } from '@mistralai/mistralai';
 
-const token = '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';
+const token = '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';
 const endpoint = "https://models.github.ai/inference";
 
 const MODELS = {
