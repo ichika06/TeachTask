@@ -3,7 +3,7 @@ import { Mistral } from '@mistralai/mistralai';
 import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
 
-const token = "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";
+const token = "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";
 const endpoint = "https://models.github.ai/inference";
 
 const MODELS = {
