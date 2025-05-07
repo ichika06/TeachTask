@@ -6,7 +6,6 @@ import { AzureKeyCredential } from "@azure/core-auth";
 const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 const endpoint = "https://models.github.ai/inference";
 
-// Define available models in order of preference
 const MODELS = {
   primary: {
     name: "openai/gpt-4.1",
@@ -70,7 +69,6 @@ export const generateAISuggestion = async ({
   customPrompt = null
 }) => {
   try {
-    // Prepare context from both tasks and todos
     const taskContext = tasks.map(t => ({
       text: t.text,
       status: t.status,
@@ -82,7 +80,6 @@ export const generateAISuggestion = async ({
       created_at: t.created_at
     }));
 
-    // Default prompts for different contexts
     const prompts = {
       task: `You are a helpful task management assistant that helps teachers organize their teaching tasks.
       Analyze both the user's current tasks and their teaching goals (todos) to suggest complementary tasks.
@@ -142,7 +139,6 @@ export const generateAISuggestion = async ({
       }
     ];
 
-    // Try each model in sequence until one works
     let lastError = null;
     for (const [key, model] of Object.entries(MODELS)) {
       try {
@@ -155,14 +151,12 @@ export const generateAISuggestion = async ({
       } catch (error) {
         lastError = error;
         if (error.message !== 'TOKEN_LIMIT') {
-          // If it's not a token limit error, don't try other models
           break;
         }
         console.log(`Model ${key} failed with token limit, trying next model...`);
       }
     }
 
-    // If we get here, all models failed
     throw lastError;
 
   } catch (error) {
@@ -175,12 +169,10 @@ export const generateAISuggestion = async ({
 };
 
 export const renderFormattedText = (text) => {
-  // Split the text by ** and map through the parts
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, index) => {
-    // If the part starts and ends with **, render it as bold
     if (part.startsWith('**') && part.endsWith('**')) {
-      const boldText = part.slice(2, -2); // Remove the **
+      const boldText = part.slice(2, -2);
       return <strong key={index}>{boldText}</strong>;
     }
     return <span key={index}>{part}</span>;
