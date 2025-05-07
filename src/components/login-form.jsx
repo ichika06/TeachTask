@@ -80,9 +80,11 @@ export function LoginForm({ className, ...props }) {
 
         if (uploadError) throw new Error(`Avatar upload failed: ${uploadError.message}`)
 
-        const { data: urlData } = supabase.storage
+        const { data: urlData } = await supabase.storage
           .from('avatars')
           .getPublicUrl(filePath)
+
+        if (!urlData) throw new Error("Failed to get public URL for the avatar.")
 
         avatarUrl = urlData.publicUrl
       }
@@ -193,8 +195,8 @@ export function LoginForm({ className, ...props }) {
                 </motion.h1>
                 <motion.p layout className="text-muted-foreground text-balance">
                   {isSignup
-                    ? "Sign up for TeachTask"
-                    : "Login to TeachTask"}
+                    ? "Sign up for your Acme Inc account"
+                    : "Login to your Acme Inc account"}
                 </motion.p>
               </motion.div>
 
