@@ -3,7 +3,7 @@ import { Mistral } from '@mistralai/mistralai';
 import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
 
-const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+const token = "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";
 const endpoint = "https://models.github.ai/inference";
 
 const MODELS = {
@@ -169,10 +169,12 @@ export const generateAISuggestion = async ({
 };
 
 export const renderFormattedText = (text) => {
+
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, index) => {
+
     if (part.startsWith('**') && part.endsWith('**')) {
-      const boldText = part.slice(2, -2);
+      const boldText = part.slice(2, -2); 
       return <strong key={index}>{boldText}</strong>;
     }
     return <span key={index}>{part}</span>;
